@@ -6,11 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,25 +31,18 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private Sensor mAccelerometer;
 	private boolean mInitialized;
 	private final float NOISE = (float) 0.25;	//can be changed/removed
-	private FileOutputStream fos;
-	private final String FILE_NAME = "SmartAlarm_Data";
-	private FileInputStream fis;
+	private DatabaseHandler db;
 //	private String text = "";		
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	try {fos = openFileOutput(FILE_NAME, Context.MODE_APPEND);} 
-    		catch (FileNotFoundException e) {e.printStackTrace();}
-    	/*test cost to make sure things are being put in file correctly
-    	try {fis = openFileInput(FILE_NAME);} 
-		catch (FileNotFoundException e) {e.printStackTrace();}
-    	/**/
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mInitialized = false;
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this,  mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        db = new DatabaseHandler(this);
     }
     
     @Override
@@ -67,9 +63,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onDestroy() {
     	super.onDestroy();
     	
-    	try {
-			fos.close();
-		} catch (IOException e) {e.printStackTrace();}
+//    	try {
+//			fos.close();
+//		} catch (IOException e) {e.printStackTrace();}
     }
     
     @Override
@@ -90,7 +86,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     	TextView tvY = (TextView) findViewById(R.id.y_axis);
     	TextView tvZ = (TextView) findViewById(R.id.z_axis);
 //    	TextView tvFile = (TextView) findViewById(R.id.read_file);
-    	//ImageView iv = (ImageView) findViewById(R.id.image);
     	float x = event.values[0];	//x value from accelerometer
     	float y = event.values[1];	//y value
     	float z = event.values[2];	//z value
@@ -121,38 +116,22 @@ public class MainActivity extends Activity implements SensorEventListener {
     		tvX.setText(Float.toString(x));
     		tvY.setText(Float.toString(y));
     		tvZ.setText(Float.toString(z));
-//    		if(deltaX > 0 || deltaY > 0 || deltaZ > 0) {
-//    			String toWrite = 
-//    		    		dateFormat.format(date) + "-" + deltaX + ","
-//    					+ deltaY + "," + deltaZ;
-//    			try {
-//					fos.write(toWrite.getBytes());
-//				} catch (IOException e) {e.printStackTrace();}
-//    		}
-    		/*this code will read the file we created
-    		if(text.equals("")) {		
-    			try {    	  
-    				int content;
-    				while ((content = fis.read()) != -1) {
-    					// convert to char and display it
-    					//remember to delete count var
-    					text += (char) content;
-    				}
-    	 
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			} finally {
-    				try {
-    					System.out.println(text);
-    					if (fis != null)
-    						fis.close();
-    				} catch (IOException ex) {
-    					ex.printStackTrace();
-    				}
+    		if(deltaX > 0 || deltaY > 0 || deltaZ > 0) {
+    			
+    			String timeStamp = dateFormat.format(date);
+    			Log.d("Insert: ", "Inserting ..");
+    			db.addDataPoint(new DataPoint(x, y, z, timeStamp));
+    		}
+    		else {
+    			List<DataPoint> dp = db.readDataPoint("2013/02/18", "2013/02/18");
+    			Log.d("Reading: ", Integer.toString(dp.size()));
+    			for(DataPoint d: dp) {
+    				String log = "Date: " + d.getTimeStamp() + ", X = " + d.getX() +
+    						", Y = " + d.getY() + ", Z = " + d.getZ();
+    				Log.d(":: ", log);
     			}
     		}
-
-			tvFile.setText(text);
+//			tvFile.setText(text);
     		/**/
     	}
     }  

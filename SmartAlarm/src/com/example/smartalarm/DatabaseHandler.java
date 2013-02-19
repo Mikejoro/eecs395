@@ -1,5 +1,8 @@
 package com.example.smartalarm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -33,8 +36,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_DATA_TABLE = "CREATE TABLE " + TABLE_DATA + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DELTA_X + " TEXT," + KEY_DELTA_Y + " TEXT,"
-                + KEY_DELTA_Z + " TEXT," + KEY_DATE + " TEXT" + ")";
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DELTA_X + " REAL," + KEY_DELTA_Y + " REAL,"
+                + KEY_DELTA_Z + " REAL," + KEY_DATE + " TEXT" + ")";
         db.execSQL(CREATE_DATA_TABLE);
     }
  
@@ -48,35 +51,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
     
-    public void addDataPoint(String dX, String dY, String dZ, String time_stamp)
+    public void addDataPoint(DataPoint dp)
     {
+    	
     	SQLiteDatabase db = this.getWritableDatabase();
     	ContentValues values = new ContentValues();
     	
-    	values.put(KEY_DELTA_X, dX);
-    	values.put(KEY_DELTA_Y, dY);
-    	values.put(KEY_DELTA_Z, dZ);
+    	values.put(KEY_DELTA_X, dp.getX());
+    	values.put(KEY_DELTA_Y, dp.getY());
+    	values.put(KEY_DELTA_Z, dp.getZ());
+    	values.put(KEY_DATE, dp.getTimeStamp());
     	
     	//Insert into table
     	db.insert(TABLE_DATA, null, values);
     	db.close();
     }
     
-    public void readDataPoint(String date_range)
+    public List<DataPoint> readDataPoint(String startDate, String endDate)
     {
     	SQLiteDatabase db = this.getReadableDatabase();
     	 
     	//right now this gets an exact date, will be changed to date range
-        Cursor cursor = db.query(TABLE_DATA, new String[] { KEY_ID,
-                KEY_DELTA_X, KEY_DELTA_Y, KEY_DELTA_Z, KEY_DATE }, KEY_DATE + "=?",
-                new String[] { date_range }, null, null, null, null);
-        if (cursor != null)
-            cursor.moveToFirst();
-        
-        float x, y, z;	//temporary storage, will be replaced with object probably
-        x = Float.parseFloat(cursor.getString(1));
-        y = Float.parseFloat(cursor.getString(2));
-        z = Float.parseFloat(cursor.getString(3));
-        String date_storage = cursor.getString(4);
+//    	String dateQuery = "SELECT " + KEY_DELTA_X + ", " + KEY_DELTA_X + ", " + 
+//    			KEY_DELTA_X + ", " + KEY_DATE + " FROM " + TABLE_DATA + " WHERE " +
+//    			KEY_DATE + " <= " + endDate + " AND " + KEY_DATE + " >= " + startDate;
+    	String dateQuery = "SELECT * FROM " + TABLE_DATA;
+    	
+        Cursor cursor = db.rawQuery(dateQuery, null);
+    	List<DataPoint> dpList = new ArrayList();
+    	 // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+            	dpList.add(new DataPoint(Float.parseFloat(cursor.getString(1)), Float.parseFloat(cursor.getString(2)), 
+            			Float.parseFloat(cursor.getString(3)), cursor.getString(4)));
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return dpList;
     }    
 }
