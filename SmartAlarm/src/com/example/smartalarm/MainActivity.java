@@ -22,6 +22,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+/* mike wrote this comment*/
 
 //Right now the commented out section is from the previous way of writing to file. In next push it will be changed to 
 //using the SQLite database in DatabaseHandler
