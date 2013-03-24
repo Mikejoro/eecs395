@@ -10,11 +10,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.hardware.Sensor;
@@ -34,6 +39,17 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private final float NOISE = (float) 0.25;	//can be changed/removed
 	private DatabaseHandler db;
 //	private String text = "";		
+	
+	public void onButtonSleepClick(View view) {   
+    	// Do something in response to button}
+    	Intent intent = new Intent(this, ConfirmSleepAlarmActivity.class);
+    	//EditText editText = (EditText) findViewById(R.id.edit_message);
+    	//String message = editText.getText().toString();
+    	//intent.putExtra(EXTRA_MESSAGE, message);
+    	startActivity(intent);
+    }
+	
+	
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
