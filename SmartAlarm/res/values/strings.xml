@@ -13,5 +13,6 @@
     <string name="viewSettings">SmartAlarm Settings</string>
     <string name="title_activity_statistics">StatisticsActivity</string>
     <string name="view_stats">View Statistics</string>
+    <string name="title_activity_sleep_mode">SleepModeActivity</string>
 
 </resources>
