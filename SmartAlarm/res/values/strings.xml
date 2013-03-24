@@ -9,5 +9,9 @@
     <string name="title_activity_confirm_sleep_alarm">Confirm Alarm</string>
     <string name="confirm_time">Confirm alarm time</string>
     <string name="confirm">Confirm</string>
+    <string name="viewStats">Show Statistics</string>
+    <string name="viewSettings">SmartAlarm Settings</string>
+    <string name="title_activity_statistics">StatisticsActivity</string>
+    <string name="view_stats">View Statistics</string>
 
 </resources>

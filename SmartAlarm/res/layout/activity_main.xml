@@ -87,7 +87,21 @@ android:visibility="invisible"/>
     android:id="@+id/button_Sleep"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="@string/button_Sleep" 
-    android:onClick="onButtonSleepClick"/>
+    android:onClick="onButtonSleepClick"
+    android:text="@string/button_Sleep" />
+
+<Button
+    android:id="@+id/button_ShowStats"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/viewStats" 
+    android:onClick="onButtonStatsClick"/>
+
+<Button
+    android:id="@+id/button_ShowSettings"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/viewSettings" 
+    android:onClick="onButtonSettingsClick"/>
 
 </LinearLayout>

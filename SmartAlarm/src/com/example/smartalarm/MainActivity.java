@@ -48,7 +48,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     	//intent.putExtra(EXTRA_MESSAGE, message);
     	startActivity(intent);
     }
-	
+	public void onButtonStatsClick(View view) {
+		Intent intent = new Intent(this, StatisticsActivity.class);
+		startActivity(intent);
+	}
+	public void onButtonSettingsClick(View view) {
+		//todo figure out settings
+	}
 	
 	
     @Override

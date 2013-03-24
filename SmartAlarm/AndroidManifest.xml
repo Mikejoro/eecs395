@@ -26,6 +26,22 @@
             android:name="com.example.smartalarm.ConfirmSleepAlarmActivity"
             android:label="@string/title_activity_confirm_sleep_alarm" >
         </activity>
+        <activity
+            android:name="com.example.smartalarm.StatisticsActivity"
+            android:label="@string/title_activity_statistics"
+            android:parentActivityName="com.example.smartalarm.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.smartalarm.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.example.smartalarm.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="com.example.smartalarm.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.smartalarm.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
