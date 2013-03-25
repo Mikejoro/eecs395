@@ -4,9 +4,12 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.os.Build;
+import com.jjoe64.graphview.*;
+import com.jjoe64.graphview.GraphView.GraphViewData;
 
 public class StatisticsActivity extends Activity {
 
@@ -14,6 +17,46 @@ public class StatisticsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_statistics);
+		
+		GraphViewSeries exampleSeries = new GraphViewSeries(new GraphViewData[] {
+				new GraphViewData(1, 2.0d)
+				, new GraphViewData(2, 1.5d)
+				, new GraphViewData(2.5, 3.0d) // another frequency
+				, new GraphViewData(3, 2.5d)
+				, new GraphViewData(4, 1.0d)
+				, new GraphViewData(5, 3.0d)
+		});
+
+		// graph with dynamically genereated horizontal and vertical labels
+		GraphView graphView;
+
+			graphView = new LineGraphView(
+					this // context
+					, "GraphViewDemo" // heading
+			);
+		
+		graphView.addSeries(exampleSeries); // data
+
+		LinearLayout layout = (LinearLayout) findViewById(R.id.graph1);
+		layout.addView(graphView);
+
+		// graph with custom labels and drawBackground
+
+			graphView = new LineGraphView(
+					this
+					, "GraphViewDemo"
+			);
+			((LineGraphView) graphView).setDrawBackground(true);
+		
+		// custom static labels
+		graphView.setHorizontalLabels(new String[] {"2 days ago", "yesterday", "today", "tomorrow"});
+		graphView.setVerticalLabels(new String[] {"high", "middle", "low"});
+		graphView.addSeries(exampleSeries); // data
+
+		layout = (LinearLayout) findViewById(R.id.graph2);
+		layout.addView(graphView);
+		
+		
 		// Show the Up button in the action bar.
 		setupActionBar();
 	}
