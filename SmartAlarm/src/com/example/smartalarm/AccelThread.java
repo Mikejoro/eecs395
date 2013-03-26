@@ -14,9 +14,9 @@ import android.hardware.SensorManager;
 public class AccelThread extends Thread implements SensorEventListener {
 
 	private boolean running = false;
-	private LinkedBlockingQueue<float[]> output;
+	private LinkedBlockingQueue<AccelDataPoint> output;
 	
-	public AccelThread(LinkedBlockingQueue<float[]> sharedQueue, Context ctx) {
+	public AccelThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue, Context ctx) {
 		setDaemon(true);
 		output = sharedQueue;
 		SensorManager manager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
@@ -38,7 +38,7 @@ public class AccelThread extends Thread implements SensorEventListener {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (running && event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			output.offer(event.values);
+			output.offer(new AccelDataPoint(System.currentTimeMillis(), event.values));
 		}
 	}
 }

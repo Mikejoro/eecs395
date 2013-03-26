@@ -19,15 +19,15 @@ public class AudioThread extends Thread {
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 	private boolean running = false;
-	private LinkedBlockingQueue<short[]> output;
+	private LinkedBlockingQueue<AudioDataPoint> output;
 	private int sample_rate;
 	private int min_buffer;
 	
-	public AudioThread(LinkedBlockingQueue<short[]> sharedQueue) {
+	public AudioThread(LinkedBlockingQueue<AudioDataPoint> sharedQueue) {
 		this(sharedQueue, 8000);
 	}
 	
-	public AudioThread(LinkedBlockingQueue<short[]> sharedQueue, int sampleRate) {
+	public AudioThread(LinkedBlockingQueue<AudioDataPoint> sharedQueue, int sampleRate) {
 		setDaemon(true);
 		output = sharedQueue;
 		sample_rate = sampleRate;
@@ -39,20 +39,21 @@ public class AudioThread extends Thread {
 		Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
 		AudioRecord recorder = null;
 		try {
-			short[] buffer = new short[min_buffer];
-			recorder = new AudioRecord(RECORDER_SOURCE, sample_rate, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, buffer.length);
+			recorder = new AudioRecord(RECORDER_SOURCE, sample_rate, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, min_buffer);
 			recorder.startRecording();
 			running = true;
 			while (running) {
+				short[] buffer = new short[min_buffer];
 				int samples = recorder.read(buffer, 0, buffer.length);
+				long ts = System.currentTimeMillis();
 				if (samples == buffer.length) {
-					output.offer(buffer);
+					output.offer(new AudioDataPoint(ts, buffer));
 				} else if (samples > 0) {
 					short[] s = new short[samples];
 					for (int i = 0; i < samples; i++) {
 						s[i] = buffer[i];
 					}
-					output.offer(s);
+					output.offer(new AudioDataPoint(ts, s));
 				}
 			}
 		} catch (Throwable e) {
