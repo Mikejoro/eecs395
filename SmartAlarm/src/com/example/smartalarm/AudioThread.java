@@ -7,6 +7,10 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Process;
 
+/*
+ * Fills a given LinkedBlockingQueue with short[]s corresponding to microphone data.
+ * The arrays are NOT guaranteed to be the same length!
+ */
 public class AudioThread extends Thread {
 	
 	private static final int RECORDER_SOURCE = MediaRecorder.AudioSource.VOICE_RECOGNITION;
@@ -15,19 +19,19 @@ public class AudioThread extends Thread {
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 	private boolean running = false;
-	private LinkedBlockingQueue<Short> output;
+	private LinkedBlockingQueue<short[]> output;
 	private int sample_rate;
 	private int min_buffer;
 	
-	public AudioThread(LinkedBlockingQueue<Short> sharedQueue) {
+	public AudioThread(LinkedBlockingQueue<short[]> sharedQueue) {
 		this(sharedQueue, 8000);
 	}
 	
-	public AudioThread(LinkedBlockingQueue<Short> sharedQueue, int sampleRate) {
+	public AudioThread(LinkedBlockingQueue<short[]> sharedQueue, int sampleRate) {
+		setDaemon(true);
 		output = sharedQueue;
 		sample_rate = sampleRate;
 		min_buffer = AudioRecord.getMinBufferSize(sample_rate, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
-		setDaemon(true);
 	}
 	
 	@Override
@@ -41,8 +45,14 @@ public class AudioThread extends Thread {
 			running = true;
 			while (running) {
 				int samples = recorder.read(buffer, 0, buffer.length);
-				for (int i = 0; i < samples; i++) {
-					output.offer((Short) buffer[i]);
+				if (samples == buffer.length) {
+					output.offer(buffer);
+				} else if (samples > 0) {
+					short[] s = new short[samples];
+					for (int i = 0; i < samples; i++) {
+						s[i] = buffer[i];
+					}
+					output.offer(s);
 				}
 			}
 		} catch (Throwable e) {
