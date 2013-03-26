@@ -22,6 +22,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.smartalarm.StatisticsActivity"
+            android:label="@string/title_activity_statistics"
+            android:parentActivityName="com.example.smartalarm.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.smartalarm.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.example.smartalarm.SleepModeActivity"
+            android:label="@string/title_activity_sleep_mode" >
+        </activity>
+        <activity android:name="ConfirmSleepAlarmActivity"></activity>
     </application>
 
 </manifest>
