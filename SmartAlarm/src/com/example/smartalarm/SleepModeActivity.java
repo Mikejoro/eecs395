@@ -1,6 +1,12 @@
 package com.example.smartalarm;
 
+import java.io.IOException;
+
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
@@ -32,6 +38,25 @@ public class SleepModeActivity extends Activity {
 	
 	public void awakeButtonClicked(View view) {
 		
+	}
+	public void testAlarmClicked(View view) {
+		
+		
+		MediaPlayer mp = MediaPlayer.create(this, Settings.System.DEFAULT_ALARM_ALERT_URI);
+		if(mp == null)
+		{
+			throw new NullPointerException(Settings.System.DEFAULT_ALARM_ALERT_URI.toString());
+		}
+		mp.setOnCompletionListener(new OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                // TODO Auto-generated method stub
+                mp.release();
+            }
+
+        });   
+        mp.start();
 	}
 
 }
