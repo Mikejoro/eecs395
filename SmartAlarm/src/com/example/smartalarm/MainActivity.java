@@ -53,7 +53,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 		startActivity(intent);
 	}
 	public void onButtonSettingsClick(View view) {
-		//todo figure out settings
+		startActivity(new Intent(this, SettingsActivity.class));
 	}
 	
 	
