@@ -5,6 +5,30 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
+
+<Button
+    android:id="@+id/button_Sleep"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:onClick="onButtonSleepClick"
+    android:text="@string/button_Sleep" />
+
+<Button
+    android:id="@+id/button_ShowStats"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/viewStats" 
+    android:onClick="onButtonStatsClick"/>
+
+<Button
+    android:id="@+id/button_ShowSettings"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/viewSettings" 
+    android:onClick="onButtonSettingsClick"/>
+    
+
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -82,26 +106,5 @@ android:layout_height="wrap_content"
 android:id="@+id/image"
 android:layout_gravity="center"
 android:visibility="invisible"/>
-
-<Button
-    android:id="@+id/button_Sleep"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:onClick="onButtonSleepClick"
-    android:text="@string/button_Sleep" />
-
-<Button
-    android:id="@+id/button_ShowStats"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/viewStats" 
-    android:onClick="onButtonStatsClick"/>
-
-<Button
-    android:id="@+id/button_ShowSettings"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/viewSettings" 
-    android:onClick="onButtonSettingsClick"/>
 
 </LinearLayout>

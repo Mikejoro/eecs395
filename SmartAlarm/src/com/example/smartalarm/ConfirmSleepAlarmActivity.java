@@ -1,6 +1,12 @@
 package com.example.smartalarm;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import android.os.Bundle;
+import android.provider.Settings;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
@@ -18,6 +24,26 @@ public class ConfirmSleepAlarmActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_confirm_sleep_alarm);
+		TimePicker timepicker = (TimePicker) findViewById(R.id.alarmTimePicker);
+		TimePicker failsafePicker = (TimePicker) findViewById(R.id.alarmFailsafePicker);
+		SimpleDateFormat sdf = new SimpleDateFormat();
+		Date defaultDate;
+		try {
+			defaultDate = sdf.parse(Settings.System.NEXT_ALARM_FORMATTED);
+			Date early = (Date) defaultDate.clone();
+			early.setTime(early.getTime() - 1000 * 60 * 30);
+			timepicker.setCurrentHour(early.getHours());
+			timepicker.setCurrentMinute(early.getMinutes());
+			failsafePicker.setCurrentHour(defaultDate.getHours());
+			failsafePicker.setCurrentMinute(defaultDate.getMinutes());
+		} catch (ParseException e) {
+			timepicker.setCurrentHour(6);
+			timepicker.setCurrentMinute(30);
+			failsafePicker.setCurrentHour(7);
+			failsafePicker.setCurrentMinute(0);
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Override
