@@ -39,12 +39,13 @@ public class Analytics {
 	}
 	
 	/**
-	 * Fast (n log(n) ish) Discrete Cosine Transform.
+	 * Fast (n log(n) ish) Fourier Transform.
 	 * @param data Data array, may be of any length, but the more composite the faster.
 	 * @return Array of same length
 	 */
-	public static float[] FDCT(float[] data) {
-		float[] out = new float[data.length]; //initialized to zeroes
+	public static float[] FFT(float[] data) {
+		float[] re = new float[data.length]; //initialized to zeroes
+		float[] im = new float[data.length]; //initialized to zeroes
 		int N, len, num, shift = 0;
 		len = N = data.length;
 		
@@ -56,27 +57,36 @@ public class Analytics {
 		shift = 32 - shift;
 		num = N / len;
 		
-		//do standard n^2 DCT on indivisible case
+		//do standard n^2 FFT on indivisible case
 		//the positions have to be rearranged to bit-reversed positions so the Cooley-Tukey algorithm can be performed in place
 		for (int b = 0; b < num; ++b)
 			for (int k = 0; k < len; ++k)
-				for (int n = 0; n < len; ++n) //Do the Harlem Shake...
-					out[Integer.reverse(b + num * k) >>> shift] += data[b + num * n] //WOB WOB WOB
-					    * (float)Math.cos(Math.PI / (double)len * ((double)n + .5) * (double)k);
+				for (int n = 0; n < len; ++n) { //Do the Harlem Shake...
+					re[b * len + k] += data[(Integer.reverse(b) >>> shift) + n * num] //WOB WOB WOB
+					    * (float)Math.cos(2 * Math.PI / (double)len * (double)n * (double)k);
+					im[b * len + k] += data[(Integer.reverse(b) >>> shift) + n * num]
+					    * -(float)Math.sin(2 * Math.PI / (double)len * (double)n * (double)k);
+				}
 		
-		//do fast DCT
+		//do fast FFT
 		for (; len != N; len *= 2, num /= 2) {
 			for (int b = 0; b < num; b += 2) {
 				for (int k = 0; k < len; ++k) {
-					float ltr = out[b * len + k];
-					float rtl = out[(b + 1) * len + k] * (float)Math.cos(Math.PI * .5 * (double)k / (double)len);
-					out[(b + 1) * len + k] *= -(float)Math.sin(Math.PI * .5 * (double)k / (double)len);
-					out[b * len + k] += rtl;
-					out[(b + 1) * len + k] += ltr;
+					//hur da durr i'm java and i don't believe in operator overloading
+					int l = b * len + k, r = l + len;
+					double phi = Math.PI * (double)k / (double)len;
+					float re_ltr = re[l];
+					float im_ltr = im[l];
+					float re_rtl =  re[r] * (float)Math.cos(phi) + im[r] * (float)Math.sin(phi);
+					float im_rtl = -re[r] * (float)Math.sin(phi) + im[r] * (float)Math.cos(phi);
+					re[r] = re_ltr - re_rtl;
+					im[r] = im_ltr - im_rtl;
+					re[l] = re_ltr + re_rtl;
+					im[l] = im_ltr + im_rtl;
 				}
 			}
 		}
 		
-		return out;
+		return re;
 	}
 }
