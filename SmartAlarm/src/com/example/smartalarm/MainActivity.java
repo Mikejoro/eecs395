@@ -13,9 +13,11 @@ import java.util.List;
 
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -38,6 +40,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private boolean mInitialized;
 	private final float NOISE = (float) 0.25;	//can be changed/removed
 	private DatabaseHandler db;
+	private SharedPreferences prefs;
 //	private String text = "";		
 	
 	public void onButtonSleepClick(View view) {   
@@ -64,15 +67,21 @@ public class MainActivity extends Activity implements SensorEventListener {
         mInitialized = false;
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this,  mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        // PreferenceManager example
+        prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+    	if (prefs.getBoolean("ck_accel", true)) {
+    		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    	}
         db = new DatabaseHandler(this);
     }
     
     @Override
     protected void onResume() {
     	super.onResume();
-    	
-    	mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    	// PreferenceManager example
+    	if (prefs.getBoolean("ck_accel", true)) {
+    		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    	}
     }
     
     @Override
