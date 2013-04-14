@@ -13,6 +13,11 @@
 			android:key="ck_mic"
 			android:defaultValue="true"
 			android:title="Collect microphone data" />
+		
+		<EditTextPreference
+			android:key="ed_life"
+			android:defaultValue="7"
+			android:title="Data lifetime (days)" />
 
 	</PreferenceCategory>
 
