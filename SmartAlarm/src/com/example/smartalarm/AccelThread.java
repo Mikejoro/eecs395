@@ -15,20 +15,22 @@ public class AccelThread extends Thread implements SensorEventListener {
 
 	private boolean running = false;
 	private LinkedBlockingQueue<AccelDataPoint> output;
+	private SensorManager manager;
 	
 	public AccelThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue, Context ctx) {
 		setDaemon(true);
 		output = sharedQueue;
-		SensorManager manager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
-		manager.registerListener(this, manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+		manager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
 	}
 	
 	@Override
 	public void run() {
 		running = true;
+		manager.registerListener(this, manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	
 	public void close() {
+		manager.unregisterListener(this);
 		running = false;
 	}
 
