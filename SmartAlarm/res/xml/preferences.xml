@@ -22,6 +22,11 @@
 		<RingtonePreference 
 		    android:key="alarm_ringtone"
 		    android:title="Alarm sound"/>
+		
+		<CheckBoxPreference
+			android:key="alarm_vibrate"
+			android:defaultValue="false"
+			android:title="Vibrate" />
 
 	</PreferenceCategory>
 
