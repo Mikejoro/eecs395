@@ -5,10 +5,13 @@ import java.io.IOException;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.View;
 
@@ -41,22 +44,22 @@ public class SleepModeActivity extends Activity {
 	}
 	public void testAlarmClicked(View view) {
 		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SleepModeActivity.this);
+		String uri = prefs.getString("alarm_ringtone", Settings.System.DEFAULT_ALARM_ALERT_URI.toString());
 		
-		MediaPlayer mp = MediaPlayer.create(this, Settings.System.DEFAULT_ALARM_ALERT_URI);
-		if(mp == null)
+		MediaPlayer mp = MediaPlayer.create(this, Uri.parse(uri));
+		if(mp != null)
 		{
-			throw new NullPointerException(Settings.System.DEFAULT_ALARM_ALERT_URI.toString());
+			
+			mp.setOnCompletionListener(new OnCompletionListener() {
+            	@Override
+            	public void onCompletion(MediaPlayer mp) {
+                	// TODO Auto-generated method stub
+                	mp.release();
+            	}
+        	});   
+        	mp.start();
 		}
-		mp.setOnCompletionListener(new OnCompletionListener() {
-
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                // TODO Auto-generated method stub
-                mp.release();
-            }
-
-        });   
-        mp.start();
 	}
 
 }
