@@ -7,9 +7,11 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
@@ -17,6 +19,10 @@ import android.view.View;
 
 public class SleepModeActivity extends Activity {
 
+	private boolean awakened = false;
+	private MediaPlayer mp;
+	private Vibrator v;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
@@ -40,26 +46,60 @@ public class SleepModeActivity extends Activity {
 	}
 	
 	public void awakeButtonClicked(View view) {
-		
+		awakened = true;
+		if(mp != null)
+		{
+			mp.stop();
+			mp.release();
+		}
+		if(v != null)
+		{
+			v.cancel();
+		}
 	}
 	public void testAlarmClicked(View view) {
+		
+		if(awakened)
+			return;
+		
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SleepModeActivity.this);
 		String uri = prefs.getString("alarm_ringtone", Settings.System.DEFAULT_ALARM_ALERT_URI.toString());
 		
-		MediaPlayer mp = MediaPlayer.create(this, Uri.parse(uri));
+		mp = MediaPlayer.create(this, Uri.parse(uri));
 		if(mp != null)
 		{
-			
-			mp.setOnCompletionListener(new OnCompletionListener() {
+			mp.setLooping(true);
+			/*mp.setOnCompletionListener(new OnCompletionListener() {
             	@Override
             	public void onCompletion(MediaPlayer mp) {
                 	// TODO Auto-generated method stub
-                	mp.release();
+            		if(awakened){
+            			mp.release();
+            		}else{
+            			mp.start();
+            		}
             	}
-        	});   
+        	});*/   
         	mp.start();
 		}
+		
+		if(prefs.getBoolean("alarm_vibrate", false))
+		{
+			// Get instance of Vibrator from current Context
+			v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+			 
+			// Start immediately
+			// Vibrate for 200 milliseconds
+			// Sleep for 500 milliseconds
+			long[] pattern = { 0, 200, 500 };
+			 
+			// The "0" means to repeat the pattern starting at the beginning
+			v.vibrate(pattern, 0);
+
+			
+		}
+		
 	}
 
 }
