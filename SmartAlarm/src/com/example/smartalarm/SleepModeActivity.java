@@ -63,14 +63,14 @@ public class SleepModeActivity extends Activity {
 			return;
 		
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SleepModeActivity.this);
-		String uri = prefs.getString("alarm_ringtone", Settings.System.DEFAULT_ALARM_ALERT_URI.toString());
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String uri = prefs.getString("alarm_ringtone", "");
 		
 		mp = MediaPlayer.create(this, Uri.parse(uri));
 		if(mp != null)
 		{
 			mp.setLooping(true);
-			/*mp.setOnCompletionListener(new OnCompletionListener() {
+			mp.setOnCompletionListener(new OnCompletionListener() {
             	@Override
             	public void onCompletion(MediaPlayer mp) {
                 	// TODO Auto-generated method stub
@@ -80,7 +80,7 @@ public class SleepModeActivity extends Activity {
             			mp.start();
             		}
             	}
-        	});*/   
+        	});   
         	mp.start();
 		}
 		
