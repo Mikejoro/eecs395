@@ -6,18 +6,18 @@ import java.util.*;
  * Clock Recovery algorithm to detect sleep cycle.
  */
 public class Analytics {
-	public static float ClockRecover(float[] points, float freq) {
-		int N = points.length;
-		float min_var = Float.MAX_VALUE;
-		float final_med = 0;
-		for (float offs : new float[]{0.f, .25f, .5f, .75f})
+	public static long ClockRecover(List<Long> points, long period) {
+		int N = points.size();
+		long min_var = Long.MAX_VALUE;
+		long final_med = 0;
+		for (long offs : new long[]{0, period / 4, period / 2, period * 3 / 4})
 		{
-			float[] modpoints = points.clone();
-			float var = 0, avg = 0;
+			long[] modpoints = new long[N];
+			long var = 0, avg = 0;
 			
 			for (int i = 0; i < N; ++i)
 			{
-				modpoints[i] = (modpoints[i] + offs) % freq;
+				modpoints[i] = (points.get(i) + offs) % period;
 				avg += modpoints[i];
 				var += modpoints[i] * modpoints[i];
 			}
@@ -29,11 +29,11 @@ public class Analytics {
 				continue;
 			
 			min_var = var;
-			Arrays.sort(points);
+			Arrays.sort(modpoints);
 			if ((N & 1) == 1) //if odd
 				final_med = modpoints[N/2];
 			else
-				final_med = (modpoints[N/2 - 1] + modpoints[N/2])/2.f;
+				final_med = (modpoints[N/2 - 1] + modpoints[N/2])/2;
 		}
 		return final_med;
 	}

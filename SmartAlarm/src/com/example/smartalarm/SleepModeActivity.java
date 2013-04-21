@@ -47,7 +47,10 @@ public class SleepModeActivity extends Activity {
 		int windowEndHours 		= intent.getIntExtra(ConfirmSleepAlarmActivity.FAILSAFE_ALARM_HOURS, 7);
 		int windowEndMinutes 	= intent.getIntExtra(ConfirmSleepAlarmActivity.FAILSAFE_ALARM_HOURS, 30);
 		
-		daemon = new AccelThread(this, .2); //this number is entirely arbitrary
+		
+		daemon = new AccelThread(this,
+				.2, //this number is entirely arbitrary
+				0, 0); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis() 
 		daemon.start();
 	}
 
