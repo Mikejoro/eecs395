@@ -39,4 +39,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/testToneUri"
         android:layout_centerHorizontal="true" />
+    <TextView 
+        android:id="@+id/testmediathreading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/testVibrateOn"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

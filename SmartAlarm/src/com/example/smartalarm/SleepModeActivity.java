@@ -34,7 +34,9 @@ public class SleepModeActivity extends Activity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		tvTone.setText(prefs.getString("alarm_ringtone", "alarm_ringtone preference does not exist"));
 		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
-		
+		TextView wake = (TextView) findViewById(R.id.testmediathreading);
+		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		wake.setText("sleep");
 
 		Intent intent = getIntent();
 		
@@ -64,6 +66,13 @@ public class SleepModeActivity extends Activity {
 		{
 			v.cancel();
 		}
+		
+		TextView wake = (TextView) findViewById(R.id.testmediathreading);
+		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		wake.setText("wake");
+
+		
+		
 	}
 	public void testAlarmClicked(View view) {
 		
@@ -81,7 +90,8 @@ public class SleepModeActivity extends Activity {
 		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		tvTone.setText(uri);
 		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
-		
+		TextView wake = (TextView) findViewById(R.id.testmediathreading);
+		wake.setText("sleep");
 
 		mp = MediaPlayer.create(this, Uri.parse(uri));
 		if(mp != null)
@@ -100,6 +110,7 @@ public class SleepModeActivity extends Activity {
         	mp.start();
 		}
 		
+	
 		if(prefs.getBoolean("alarm_vibrate", false))
 		{
 			// Get instance of Vibrator from current Context
