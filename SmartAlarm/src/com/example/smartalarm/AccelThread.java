@@ -1,5 +1,6 @@
 package com.example.smartalarm;
 
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
@@ -8,19 +9,28 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-/*
+/**
  * Fills a given LinkedBlockingQueue with float[]s corresponding to accelerometer data {x, y, z}.
  */
 public class AccelThread extends Thread implements SensorEventListener {
 
 	private boolean running = false;
-	private LinkedBlockingQueue<AccelDataPoint> output;
+	private ArrayList<Long> output = new ArrayList<Long>();
 	private SensorManager manager;
+	private SleepModeActivity activity;
+	private double sensitivity = 0.;
+	private float lastX = 0, lastY = 0, lastZ = 0;
 	
-	public AccelThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue, Context ctx) {
+	/**
+	 * New accelerometer monitoring thread
+	 * @param ctx App Context
+	 * @param sensty Minimum accelerometer value 
+	 */
+	public AccelThread(SleepModeActivity act, double sensty) {
 		setDaemon(true);
-		output = sharedQueue;
-		manager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
+		sensitivity = sensty * sensty; //square now so we don't have to square root all the time
+		activity = act;
+		manager = (SensorManager) act.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
 	}
 	
 	@Override
@@ -40,7 +50,11 @@ public class AccelThread extends Thread implements SensorEventListener {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (running && event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			output.offer(new AccelDataPoint(System.currentTimeMillis(), event.values));
+			float x = event.values[0] - lastX, y = event.values[1] - lastY, z = event.values[2] - lastZ;
+			lastX = event.values[0]; lastY = event.values[1]; lastZ = event.values[2];
+			
+			if (x*x + y*y + z*z > sensitivity)
+				output.add(System.currentTimeMillis());
 		}
 	}
 }
