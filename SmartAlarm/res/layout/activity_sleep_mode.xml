@@ -22,9 +22,21 @@
         android:id="@+id/testAlarmButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/wakeup_button"
+        android:layout_below="@id/wakeup_button"
         android:layout_centerHorizontal="true"
         android:onClick="testAlarmClicked"
         android:text="Test Alarm" />
-
+    
+    <TextView 
+        android:id="@+id/testToneUri"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/testAlarmButton"
+        android:layout_centerHorizontal="true" />"
+    <TextView 
+        android:id="@+id/testVibrateOn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/testToneUri"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

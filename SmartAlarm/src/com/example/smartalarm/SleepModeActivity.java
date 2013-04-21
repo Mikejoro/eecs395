@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 
 public class SleepModeActivity extends Activity {
 
@@ -28,6 +29,13 @@ public class SleepModeActivity extends Activity {
 		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.activity_sleep_mode);
 		
+		TextView tvTone = (TextView) findViewById(R.id.testToneUri);
+		TextView tvVibrate = (TextView) findViewById(R.id.testVibrateOn);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		tvTone.setText(prefs.getString("alarm_ringtone", "alarm_ringtone preference does not exist"));
+		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
+		
+
 		Intent intent = getIntent();
 		
 		//The start time and end time for the alarm window are passed into the activity on its creation
@@ -62,10 +70,19 @@ public class SleepModeActivity extends Activity {
 		if(awakened)
 			return;
 		
+
+		
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String uri = prefs.getString("alarm_ringtone", "");
+				
+		TextView tvTone = (TextView) findViewById(R.id.testToneUri);
+		TextView tvVibrate = (TextView) findViewById(R.id.testVibrateOn);
+		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		tvTone.setText(uri);
+		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
 		
+
 		mp = MediaPlayer.create(this, Uri.parse(uri));
 		if(mp != null)
 		{
@@ -73,7 +90,6 @@ public class SleepModeActivity extends Activity {
 			mp.setOnCompletionListener(new OnCompletionListener() {
             	@Override
             	public void onCompletion(MediaPlayer mp) {
-                	// TODO Auto-generated method stub
             		if(awakened){
             			mp.release();
             		}else{
