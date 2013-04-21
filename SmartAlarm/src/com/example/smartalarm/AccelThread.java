@@ -85,7 +85,7 @@ public class AccelThread extends Thread implements SensorEventListener {
 		
 		synchronized (output) {
 			//if they haven't moved over an hour they probably fell asleep
-			if (fellAsleepIdx == -1 && System.currentTimeMillis() - output.get(output.size()-1) > 60 * 60 * 1000)
+			if (fellAsleepIdx == -1 && output.size() != 0 && System.currentTimeMillis() - output.get(output.size()-1) > 60 * 60 * 1000)
 				fellAsleepIdx = output.size();
 			
 			output.add(System.currentTimeMillis());
