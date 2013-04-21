@@ -23,6 +23,7 @@ public class SleepModeActivity extends Activity {
 	private boolean awakened = false;
 	private MediaPlayer mp;
 	private Vibrator v;
+	AccelThread daemon;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,11 @@ public class SleepModeActivity extends Activity {
 		int windowEndHours 		= intent.getIntExtra(ConfirmSleepAlarmActivity.FAILSAFE_ALARM_HOURS, 7);
 		int windowEndMinutes 	= intent.getIntExtra(ConfirmSleepAlarmActivity.FAILSAFE_ALARM_HOURS, 30);
 		
+		
+		daemon = new AccelThread(this,
+				.2, //this number is entirely arbitrary
+				0, 0); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis() 
+		daemon.start();
 	}
 
 	@Override
@@ -77,19 +83,19 @@ public class SleepModeActivity extends Activity {
 		
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
 		wake.setText("wake");
-		
+
 		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
-		
-		
+
 	}
+	
 	public void testAlarmClicked(View view) {
-		
+		triggerAlarm();
+	}
+	
+	public void triggerAlarm() {
 		if(awakened)
 			return;
-		
-
-		
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String uri = prefs.getString("alarm_ringtone", "");
@@ -132,10 +138,6 @@ public class SleepModeActivity extends Activity {
 			 
 			// The "0" means to repeat the pattern starting at the beginning
 			v.vibrate(pattern, 0);
-
-			
 		}
-		
 	}
-
 }
