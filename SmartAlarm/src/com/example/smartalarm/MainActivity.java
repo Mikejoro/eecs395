@@ -40,15 +40,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private boolean mInitialized;
 	private final float NOISE = (float) 0.25;	//can be changed/removed
 	private DatabaseHandler db;
-	private SharedPreferences prefs;
-//	private String text = "";		
+	private SharedPreferences prefs;		
 	
 	public void onButtonSleepClick(View view) {   
-    	// Do something in response to button}
     	Intent intent = new Intent(this, ConfirmSleepAlarmActivity.class);
-    	//EditText editText = (EditText) findViewById(R.id.edit_message);
-    	//String message = editText.getText().toString();
-    	//intent.putExtra(EXTRA_MESSAGE, message);
     	startActivity(intent);
     }
 	public void onButtonStatsClick(View view) {

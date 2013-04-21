@@ -29,13 +29,13 @@ public class SleepModeActivity extends Activity {
 		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.activity_sleep_mode);
 		
+		//debug textviews
 		TextView tvTone = (TextView) findViewById(R.id.testToneUri);
 		TextView tvVibrate = (TextView) findViewById(R.id.testVibrateOn);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		tvTone.setText(prefs.getString("alarm_ringtone", "alarm_ringtone preference does not exist"));
 		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
-		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		wake.setText("sleep");
 
 		Intent intent = getIntent();
@@ -68,10 +68,7 @@ public class SleepModeActivity extends Activity {
 		}
 		
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
-		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		wake.setText("wake");
-
-		
 		
 	}
 	public void testAlarmClicked(View view) {
@@ -85,9 +82,9 @@ public class SleepModeActivity extends Activity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String uri = prefs.getString("alarm_ringtone", "");
 				
+		//debug textviews
 		TextView tvTone = (TextView) findViewById(R.id.testToneUri);
 		TextView tvVibrate = (TextView) findViewById(R.id.testVibrateOn);
-		//SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		tvTone.setText(uri);
 		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
