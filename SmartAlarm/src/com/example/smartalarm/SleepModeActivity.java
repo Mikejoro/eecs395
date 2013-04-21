@@ -59,8 +59,16 @@ public class SleepModeActivity extends Activity {
 		awakened = true;
 		if(mp != null)
 		{
-			mp.stop();
-			mp.release();
+			
+			if(mp.isPlaying()){
+				try{
+					mp.stop();
+				}catch(IllegalStateException e){}
+			}
+			try{
+				mp.release();
+			}catch(IllegalStateException e){}
+			
 		}
 		if(v != null)
 		{
@@ -69,6 +77,10 @@ public class SleepModeActivity extends Activity {
 		
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
 		wake.setText("wake");
+		
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
+		
 		
 	}
 	public void testAlarmClicked(View view) {
