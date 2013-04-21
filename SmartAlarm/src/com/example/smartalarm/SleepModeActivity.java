@@ -29,7 +29,7 @@ public class SleepModeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.activity_sleep_mode);
-		
+		/*
 		//debug textviews
 		TextView tvTone = (TextView) findViewById(R.id.testToneUri);
 		TextView tvVibrate = (TextView) findViewById(R.id.testVibrateOn);
@@ -38,7 +38,7 @@ public class SleepModeActivity extends Activity {
 		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
 		wake.setText("sleep");
-
+*/
 		Intent intent = getIntent();
 		
 		//The start time and end time for the alarm window are passed into the activity on its creation
@@ -80,10 +80,10 @@ public class SleepModeActivity extends Activity {
 		{
 			v.cancel();
 		}
-		
+		/*
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
 		wake.setText("wake");
-
+*/
 		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
 
@@ -99,14 +99,14 @@ public class SleepModeActivity extends Activity {
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String uri = prefs.getString("alarm_ringtone", "");
-				
+				/*
 		//debug textviews
 		TextView tvTone = (TextView) findViewById(R.id.testToneUri);
 		TextView tvVibrate = (TextView) findViewById(R.id.testVibrateOn);
 		tvTone.setText(uri);
 		tvVibrate.setText(String.valueOf(prefs.getBoolean("alarm_vibrate", false)));
 		TextView wake = (TextView) findViewById(R.id.testmediathreading);
-		wake.setText("sleep");
+		wake.setText("sleep");*/
 
 		mp = MediaPlayer.create(this, Uri.parse(uri));
 		if(mp != null)
