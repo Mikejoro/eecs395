@@ -47,18 +47,15 @@ public class AudioThread extends Thread {
 			recorder = new AudioRecord(RECORDER_SOURCE, sample_rate, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, min_buffer);
 			recorder.startRecording();
 			running = true;
+			int samples = 0;
+			short[] buffer = new short[min_buffer];
 			while (running) {
-				short[] buffer = new short[min_buffer];
-				int samples = recorder.read(buffer, 0, buffer.length);
-				long ts = System.currentTimeMillis();
-				if (samples == buffer.length) {
+				samples += recorder.read(buffer, samples, min_buffer - samples);
+				if (samples == min_buffer) {
+					long ts = System.currentTimeMillis();
 					output.offer(new AudioDataPoint(ts, buffer));
-				} else if (samples > 0) {
-					short[] s = new short[samples];
-					for (int i = 0; i < samples; i++) {
-						s[i] = buffer[i];
-					}
-					output.offer(new AudioDataPoint(ts, s));
+					samples = 0;
+					buffer = new short[min_buffer];
 				}
 			}
 		} catch (Throwable e) {
