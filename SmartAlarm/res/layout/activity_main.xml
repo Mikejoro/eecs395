@@ -26,8 +26,21 @@
     android:layout_height="wrap_content"
     android:text="@string/viewSettings" 
     android:onClick="onButtonSettingsClick"/>
-    
 
+<Button
+    android:id="@+id/button_TestSaveLoad"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="TEST SAVE LOAD" 
+    android:onClick="onButtonTestFilesClick"/>
+    
+<TextView 
+    android:id="@+id/textTestFiles"
+   android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="20dip"
+        android:text="test me" />
 
     <TextView
         android:layout_width="fill_parent"

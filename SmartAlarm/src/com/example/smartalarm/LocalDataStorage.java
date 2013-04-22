@@ -14,12 +14,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 public class LocalDataStorage {
 
 	public final String DATA_TYPE_ACCEL = "accel";
 	public final String DATA_TYPE_AUDIO = "audio";
-	
+	private String delim = "\n";
 	private Context context;
 	public LocalDataStorage(Context context)
 	{
@@ -31,8 +32,9 @@ public class LocalDataStorage {
 		GregorianCalendar now = new GregorianCalendar();
 		
 		//this filename is foolproof!
-		String filename = DATA_TYPE_ACCEL + "_" + now.get(Calendar.YEAR) + "_" + now.get(Calendar.MONTH) 
+		String filename = DATA_TYPE_ACCEL + "_" + now.get(Calendar.YEAR) + "_" + (now.get(Calendar.MONTH) +1) //zero-based wtf
 				+ "_" + now.get(Calendar.DAY_OF_MONTH);
+		Log.d("generated Filename:", filename);
 		FileOutputStream fos;
 		OutputStream out = null;
 		try {
@@ -41,21 +43,9 @@ public class LocalDataStorage {
 			
 			for(int i = 0; i < data.size(); i++)
 			{
-				long point = data.get(i);
-				String bin = Long.toBinaryString(point);
-				String hex = Long.toHexString(point);
-				byte[] buffer = new byte[8];
-				int l = hex.length();
-				
-				//go from end of hex string converting bytes, in case msB of long is 0, and first char of string
-				// is not actually the first byte of the array
-				for(int b = 0; b < l; b ++)
-				{
-					int charNum = l - 1 - b;
-					buffer[7-b] = Byte.parseByte(hex.substring(charNum, charNum + 1), 16);
-				}
-				
-				out.write(buffer, 0, 8);
+				String line = Long.toString(data.get(i)) +delim;
+				Log.d("write data:", line);
+				out.write(line.getBytes());
 			}
 			
 			
@@ -89,24 +79,29 @@ public class LocalDataStorage {
 			fis = context.openFileInput(filename);
 			in = new BufferedInputStream(fis);
 			boolean done = false;
+			ArrayList<Byte> bytes = new ArrayList<Byte>();
 			do{
-				int[] buffer = new int[8];
-				for(int b = 0; b < 8; b++)
+				int myByte = in.read();
+				if(myByte == -1)
 				{
-					int myByte = in.read();
-					if(myByte == -1)
+					done = true;
+				}
+				else
+				{
+					bytes.add((byte)myByte);
+					byte[] bts = new byte[bytes.size()];
+					for(int f = 0; f < bytes.size(); f++)
 					{
-						done = true;
-						break;
+						bts[f] = bytes.get(f);
 					}
-					buffer[b] = myByte;
+					String number = new String(bts);
+					if(number.endsWith(delim)){
+						outData.add(Long.parseLong(number.replace(delim, "")));
+						bytes.clear();
+					}
+					
 				}
-				long val = 0;
-				for(int b = 0; b < 8; b++)
-				{
-					val += buffer[b] * Math.pow(256, 8-b-1);
-				}
-				outData.add(val);
+				
 				
 			}while(!done);
 			
@@ -116,7 +111,8 @@ public class LocalDataStorage {
 		}
 		finally{
 			try {
-				in.close();
+				if(in != null)
+					in.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

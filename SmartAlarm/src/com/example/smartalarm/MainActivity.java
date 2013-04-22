@@ -53,6 +53,35 @@ public class MainActivity extends Activity implements SensorEventListener {
 	public void onButtonSettingsClick(View view) {
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
+	public void onButtonTestFilesClick(View view) {
+		LocalDataStorage lds = new LocalDataStorage(this);
+		ArrayList<Long> testData = new ArrayList<Long>();
+		testData.add((long) 111999111);
+		//testData.add(Long.MIN_VALUE);
+		testData.add(Long.MAX_VALUE);
+		testData.add(Long.MAX_VALUE - 100);
+		testData.add(Long.MAX_VALUE - 10000);
+		lds.saveAccelFile(testData);
+		ArrayList<Long> readData = lds.readAccelFile(2013, 4, 22);
+		boolean failed = false;
+		if(readData.size() == 0) failed = true;
+		for(int i = 0; i < testData.size(); i++)
+		{
+			if((long)testData.get(i) != (long)readData.get(i))
+			{
+				TextView test = (TextView) findViewById(R.id.textTestFiles);
+				test.setText("failed" + testData.get(i) + " not equal " + readData.get(i));
+				failed = true;
+				break;
+			}
+		}
+		if(!failed)
+		{
+			TextView test = (TextView) findViewById(R.id.textTestFiles);
+			test.setText("success");
+		}
+		
+	}
 	
 	
     @Override
