@@ -54,7 +54,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
 	public void onButtonTestFilesClick(View view) {
-		LocalDataStorage lds = new LocalDataStorage(this);
+		/*LocalDataStorage lds = new LocalDataStorage(this);
 		ArrayList<Long> testData = new ArrayList<Long>();
 		testData.add((long) 111999111);
 		//testData.add(Long.MIN_VALUE);
@@ -79,7 +79,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 		{
 			TextView test = (TextView) findViewById(R.id.textTestFiles);
 			test.setText("success");
-		}
+		}*/
 		
 	}
 	
