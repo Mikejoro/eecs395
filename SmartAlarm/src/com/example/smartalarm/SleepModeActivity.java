@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -70,6 +71,7 @@ public class SleepModeActivity extends Activity {
 			endCalendar.add(Calendar.HOUR_OF_DAY, 12);
 		}
 		
+		hdlr = new AlarmHandler(this);
 		
 		daemon = new AccelThread(this,
 				.2, //this number is entirely arbitrary
@@ -118,6 +120,22 @@ public class SleepModeActivity extends Activity {
 	}
 	
 	public void triggerAlarm() {
+		hdlr.sendEmptyMessage(0);
+	}
+	
+	//this prevents ui thread issues
+	private static class AlarmHandler extends Handler {
+		private SleepModeActivity act = null;
+		public void handleMessage(android.os.Message msg) {
+			act.doAlarm();
+		}
+		public AlarmHandler(SleepModeActivity a) {
+			act = a;
+		}
+	};
+	private static AlarmHandler hdlr = null;
+	
+	private void doAlarm() {
 		if(awakened)
 			return;
 		
