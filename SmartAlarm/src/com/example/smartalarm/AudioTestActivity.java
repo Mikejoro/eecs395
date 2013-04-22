@@ -58,8 +58,8 @@ public class AudioTestActivity extends Activity {
 					queue.clear();
 					double[] fft = Analytics.FFT(dp.data);
 					
-					GraphViewData[] points = new GraphViewData[fft.length];
-					for (int i=0; i<fft.length; ++i)
+					GraphViewData[] points = new GraphViewData[fft.length/2];
+					for (int i=0; i<fft.length/2; ++i)
 						points[i] = new GraphViewData(i, fft[i]);
 					GraphViewSeries ser = new GraphViewSeries(points);
 					graphView.removeSeries(0);
