@@ -13,7 +13,7 @@ import android.os.Process;
  */
 public class AudioThread extends Thread {
 	
-	private static final int RECORDER_SOURCE = MediaRecorder.AudioSource.VOICE_RECOGNITION;
+	private static final int RECORDER_SOURCE = MediaRecorder.AudioSource.MIC;
 	private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
 	//[NOTE] AudioFormat.ENCODING_PCM_8BIT fails because it's unimplemented
 	private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -31,7 +31,12 @@ public class AudioThread extends Thread {
 		setDaemon(true);
 		output = sharedQueue;
 		sample_rate = sampleRate;
-		min_buffer = AudioRecord.getMinBufferSize(sample_rate, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+		int smallest_buffer = AudioRecord.getMinBufferSize(sample_rate, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+		min_buffer = 1;
+		while (smallest_buffer != 0) { //round up to nearest power of 2
+			smallest_buffer >>= 1;
+			min_buffer <<= 1;
+		}
 	}
 	
 	@Override
