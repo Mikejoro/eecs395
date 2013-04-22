@@ -37,7 +37,24 @@ public class Analytics {
 		}
 		return final_med;
 	}
-	
+
+	/**
+	 * Fast (n log(n) ish) Fourier Transform, in convenient types.
+	 * @param data Data array, may be of any length, but the more composite the faster.
+	 * @return Array of same length
+	 */
+	public static double[] FFT(short[] data) {
+		float[] nIn = new float[data.length];
+		for (int i=0; i<nIn.length; ++i)
+			nIn[i] = (float)data[i] / (float)Short.MAX_VALUE;
+		
+		float[] nOut = FFT(nIn);
+		
+		double[] out = new double[nOut.length];
+		for (int i=0; i<nOut.length; ++i)
+			out[i] = nOut[i];
+		return out;
+	}
 	/**
 	 * Fast (n log(n) ish) Fourier Transform.
 	 * @param data Data array, may be of any length, but the more composite the faster.

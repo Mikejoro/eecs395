@@ -53,6 +53,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 	public void onButtonSettingsClick(View view) {
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
+	public void onButtonAudioClick(View view) {
+		startActivity(new Intent(this, AudioTestActivity.class));
+	}
 	
 	
     @Override

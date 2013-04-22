@@ -7,9 +7,9 @@
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="10" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.example.smartalarm.StatisticsActivity"
             android:label="@string/title_activity_statistics"
@@ -38,8 +37,21 @@
             android:name="com.example.smartalarm.SleepModeActivity"
             android:label="@string/title_activity_sleep_mode" >
         </activity>
-        <activity android:name="ConfirmSleepAlarmActivity"></activity>
-        <activity android:name=".SettingsActivity" android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
+        <activity android:name="com.example.smartalarm.ConfirmSleepAlarmActivity" >
+        </activity>
+        <activity
+            android:name="com.example.smartalarm.SettingsActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar" android:configChanges="orientation" android:screenOrientation="landscape">
+        </activity>
+        <activity
+            android:name="com.example.smartalarm.AudioTestActivity"
+            android:label="@string/title_activity_audio_test"
+            android:parentActivityName="com.example.smartalarm.MainActivity"
+            android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.smartalarm.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

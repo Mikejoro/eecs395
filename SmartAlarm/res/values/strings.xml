@@ -15,5 +15,6 @@
     <string name="view_stats">View Statistics</string>
     <string name="title_activity_sleep_mode">SmartAlarm: Sleep Mode</string>
     <string name="confirm_failsafe_time">Confirm latest possible alarm time</string>
+    <string name="title_activity_audio_test">Audio Test</string>
 
 </resources>
