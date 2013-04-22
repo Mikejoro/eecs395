@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 public class SleepModeActivity extends Activity {
 
-	private boolean awakened = false;
+	private boolean awakened = false; //no longer really necessary
 	private MediaPlayer mp;
 	private Vibrator v;
 	AccelThread daemon;
