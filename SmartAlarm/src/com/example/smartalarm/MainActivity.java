@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,9 +51,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 		Intent intent = new Intent(this, StatisticsActivity.class);
 		startActivity(intent);
 	}
-	public void onButtonSettingsClick(View view) {
-		startActivity(new Intent(this, SettingsActivity.class));
-	}
 	public void onButtonTestFilesClick(View view) {
 		/*LocalDataStorage lds = new LocalDataStorage(this);
 		ArrayList<Long> testData = new ArrayList<Long>();
@@ -81,6 +79,18 @@ public class MainActivity extends Activity implements SensorEventListener {
 			test.setText("success");
 		}*/
 		
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.menu_settings:
+	        	startActivity(new Intent(this, SettingsActivity.class));
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	
