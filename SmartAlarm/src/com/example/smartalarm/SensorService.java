@@ -2,8 +2,10 @@ package com.example.smartalarm;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.Service;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,22 +20,33 @@ import android.os.Process;
 import android.util.Log;
 
 public class SensorService extends Service implements SensorEventListener {
-	
+
 	private static final String TAG = SensorService.class.getName();
 	private static final int SCREEN_OFF_RECEIVER_DELAY = 500;
 	private static final long WAIT_THREAD_CLOSE = 1000;
 
-	//private Context mContext;
+	private static boolean isServiceRunning(Context context, Class<?> klass) {
+		String name = klass.getName();
+		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (service.service.getClassName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private Context mContext;
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 	//private PowerManager mPowerManager;
 	//private WakeLock mWakeLock;
-	
+
 	private LinkedBlockingQueue<AccelDataPoint> sharedQueue;
 	private ConsumerThread mThread;
 
 	private void registerListener() {
-		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
+		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
 	private void unregisterListener() {
@@ -60,11 +73,12 @@ public class SensorService extends Service implements SensorEventListener {
 	public void onCreate() {
 		super.onCreate();
 		//mContext = getApplicationContext();
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mContext = this;
+		mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		//mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		//mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 		//mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-		registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+		mContext.registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 		sharedQueue = new LinkedBlockingQueue<AccelDataPoint>();
 		mThread = new ConsumerThread(sharedQueue);
 	}
@@ -87,7 +101,7 @@ public class SensorService extends Service implements SensorEventListener {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		unregisterReceiver(mReceiver);
+		mContext.unregisterReceiver(mReceiver);
 		unregisterListener();
 		//mWakeLock.release();
 		stopForeground(true);
@@ -105,7 +119,7 @@ public class SensorService extends Service implements SensorEventListener {
 	public void onSensorChanged(SensorEvent event) {
 		switch (event.sensor.getType()) {
 			case Sensor.TYPE_ACCELEROMETER: {
-				Log.i(TAG, "sensor");
+				//Log.i(TAG, "sensor");
 				sharedQueue.offer(new AccelDataPoint(System.currentTimeMillis(), event.values.clone()));
 			}
 		}
