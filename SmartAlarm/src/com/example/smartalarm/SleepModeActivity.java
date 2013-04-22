@@ -1,6 +1,9 @@
 package com.example.smartalarm;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -47,13 +50,34 @@ public class SleepModeActivity extends Activity {
 		int windowEndHours 		= intent.getIntExtra(ConfirmSleepAlarmActivity.FAILSAFE_ALARM_HOURS, 7);
 		int windowEndMinutes 	= intent.getIntExtra(ConfirmSleepAlarmActivity.FAILSAFE_ALARM_HOURS, 30);
 		
+		//got to use time since  January 1, 1970 00:00:00 UTC
+		//first find datetime corresponding to hour,minute pair entered in app
+		GregorianCalendar now = new GregorianCalendar();
+		
+		//make sure start of window is after current time
+		GregorianCalendar startCalendar = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), 
+				now.get(Calendar.DAY_OF_MONTH), windowStartHours, windowStartMinutes );
+		while(now.after(startCalendar))
+		{
+			startCalendar.add(Calendar.HOUR_OF_DAY, 12);
+		}
+		
+		//make sure end of window is after start of window
+		GregorianCalendar endCalendar = new GregorianCalendar(startCalendar.get(Calendar.YEAR), startCalendar.get(Calendar.MONTH),
+				startCalendar.get(Calendar.DAY_OF_MONTH), windowEndHours, windowEndMinutes);
+		while(startCalendar.after(endCalendar))
+		{
+			endCalendar.add(Calendar.HOUR_OF_DAY, 12);
+		}
+		
 		
 		daemon = new AccelThread(this,
 				.2, //this number is entirely arbitrary
-				0, 0); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis() 
+				startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis()); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis() 
 		daemon.start();
 	}
 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
