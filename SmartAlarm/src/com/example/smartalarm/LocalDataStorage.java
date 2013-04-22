@@ -1,9 +1,12 @@
 package com.example.smartalarm;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +34,7 @@ public class LocalDataStorage {
 		String filename = DATA_TYPE_ACCEL + "_" + now.get(Calendar.YEAR) + "_" + now.get(Calendar.MONTH) 
 				+ "_" + now.get(Calendar.DAY_OF_MONTH);
 		FileOutputStream fos;
-		OutputStream out;
+		OutputStream out = null;
 		try {
 			fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
 			out = new BufferedOutputStream(fos);
@@ -63,9 +66,64 @@ public class LocalDataStorage {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		finally{
+			if(out != null)
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
 		
 		
+	}
+	
+	public ArrayList<Long> readAccelFile(int year, int month, int day)
+	{
+		ArrayList<Long> outData = new ArrayList<Long>();
+		String filename = DATA_TYPE_ACCEL + "_" + year + "_" + month + "_" + day;
+		FileInputStream fis;
+		BufferedInputStream in = null;
+		try{
+			fis = context.openFileInput(filename);
+			in = new BufferedInputStream(fis);
+			boolean done = false;
+			do{
+				int[] buffer = new int[8];
+				for(int b = 0; b < 8; b++)
+				{
+					int myByte = in.read();
+					if(myByte == -1)
+					{
+						done = true;
+						break;
+					}
+					buffer[b] = myByte;
+				}
+				long val = 0;
+				for(int b = 0; b < 8; b++)
+				{
+					val += buffer[b] * Math.pow(256, 8-b-1);
+				}
+				outData.add(val);
+				
+			}while(!done);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return outData;
 	}
 	
 }
