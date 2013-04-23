@@ -67,7 +67,7 @@ public class SensorService extends Service implements SensorEventListener {
 	private Thread mThread;
 
 	private void registerListener() {
-		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
 	}
 
 	private void unregisterListener() {
