@@ -39,8 +39,13 @@
             android:name="com.example.smartalarm.SleepModeActivity"
             android:label="@string/title_activity_sleep_mode" >
         </activity>
+        <activity
+            android:name="com.example.smartalarm.AlarmActivity"
+            android:label="@string/title_activity_alarm" >
+        </activity>
         <activity android:name="ConfirmSleepAlarmActivity"></activity>
         <activity android:name=".SettingsActivity" android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
+        <service android:name=".SensorService" android:enabled="true"></service>
     </application>
 
 </manifest>

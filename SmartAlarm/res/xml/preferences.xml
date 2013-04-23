@@ -18,6 +18,11 @@
 			android:key="ed_life"
 			android:defaultValue="7"
 			android:title="Data lifetime (days)" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="Alarm Preferences" >
 		
 		<RingtonePreference 
 		    android:key="alarm_ringtone"

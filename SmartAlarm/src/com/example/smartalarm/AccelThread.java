@@ -9,16 +9,16 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 /**
  * Fills a given LinkedBlockingQueue with float[]s corresponding to accelerometer data {x, y, z}.
  */
-public class AccelThread extends Thread implements SensorEventListener {
+public class AccelThread extends Thread {
 
-	private boolean running = false;
+	private LinkedBlockingQueue<AccelDataPoint> q;
 	private ArrayList<Long> output = new ArrayList<Long>();
-	private SensorManager manager;
-	private SleepModeActivity activity;
+	private Context ctx;
 	private double sensitivity = 0.;
 	private float lastX = 0, lastY = 0, lastZ = 0;
 	private int fellAsleepIdx = -1; //output[fellAsleepIdx] is first data point when user is asleep
@@ -35,60 +35,50 @@ public class AccelThread extends Thread implements SensorEventListener {
 	 * @param ctx App Context
 	 * @param sensty Minimum accelerometer value 
 	 */
-	public AccelThread(SleepModeActivity act, double sensty, long wakeAfter, long wakeBefore) {
+	public AccelThread(LinkedBlockingQueue<AccelDataPoint> q, Context context, double sensty, long wakeAfter, long wakeBefore) {
 		setDaemon(true);
+		this.q = q;
 		sensitivity = sensty * sensty; //square now so we don't have to square root all the time
-		activity = act;
+		ctx = context;
 		after = wakeAfter;
 		before = wakeBefore;
-		manager = (SensorManager) act.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
 	}
-	
+
 	@Override
 	public void run() {
-		running = true;
-		manager.registerListener(this, manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-		
-		try {
-			while (true) {
-				try {
-					sleep(60 * 1000);
-				} catch (InterruptedException e) {}
-				if (checkWakeup()){
-					activity.triggerAlarm();
-					break;
-				}
+		while (true) {
+			AccelDataPoint data;
+			try {
+				// LinkedBlockingQueue.take() is a blocking operation
+				data = q.take();
+			} catch (InterruptedException e) {
+				// thread is closing
+				break;
 			}
-		} finally {
-			close(); //clean up even if something weird happens
+			// process the data here
+			onSensorChanged(data);
+			if (checkWakeup()) {
+				//activity.triggerAlarm();
+				((SensorService) ctx).triggerAlarm();
+				break;
+			}
 		}
-	}
-	
-	public void close() {
-		manager.unregisterListener(this);
-		running = false;
+		//[TODO] cleanup here
 	}
 
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (!running || event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
-			return;
-		
-		float x = event.values[0] - lastX, y = event.values[1] - lastY, z = event.values[2] - lastZ;
-		lastX = event.values[0]; lastY = event.values[1]; lastZ = event.values[2];
+	private void onSensorChanged(AccelDataPoint p) {
+		float x = p.data[0] - lastX, y = p.data[1] - lastY, z = p.data[2] - lastZ;
+		lastX = p.data[0]; lastY = p.data[1]; lastZ = p.data[2];
 			
 		if (x*x + y*y + z*z < sensitivity)
 			return;
 		
 		synchronized (output) {
 			//if they haven't moved over an hour they probably fell asleep
-			if (fellAsleepIdx == -1 && output.size() != 0 && System.currentTimeMillis() - output.get(output.size()-1) > 60 * 60 * 1000)
+			if (fellAsleepIdx == -1 && output.size() != 0 && p.time - output.get(output.size()-1) > 60 * 60 * 1000)
 				fellAsleepIdx = output.size();
 			
-			output.add(System.currentTimeMillis());
+			output.add(p.time);
 		}
 	}
 	

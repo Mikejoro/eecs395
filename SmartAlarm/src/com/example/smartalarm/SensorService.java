@@ -1,9 +1,6 @@
 package com.example.smartalarm;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.zip.GZIPOutputStream;
 
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -18,7 +15,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Process;
@@ -97,8 +93,8 @@ public class SensorService extends Service implements SensorEventListener {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		//mContext = getApplicationContext();
-		mContext = this;
+		//mContext = this.getApplicationContext();
+		mContext = this.getBaseContext();
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -108,9 +104,9 @@ public class SensorService extends Service implements SensorEventListener {
 
 		sharedQueue = new LinkedBlockingQueue<AccelDataPoint>();
 		if (mPrefs.getBoolean("ck_accel", true)) {
-			mThread = new StorageThread(sharedQueue);
+			mThread = new AccelThread(sharedQueue, this, 0.2, minTime, maxTime);
 		} else {
-			mThread = new DummyThread(sharedQueue, this, minTime, maxTime);
+			mThread = new DummyThread(sharedQueue);
 		}
 	}
 
@@ -123,6 +119,13 @@ public class SensorService extends Service implements SensorEventListener {
 		registerListener();
 		//mWakeLock.acquire();
 		mThread.start();
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				triggerAlarm();
+			}
+		//[TODO] calculate delay necessary to trigger at maxTime
+		}, 10 * 1000);
 		return START_STICKY;
 	}
 
@@ -158,22 +161,22 @@ public class SensorService extends Service implements SensorEventListener {
 		}
 	}
 
+	public void triggerAlarm() {
+		Intent intent = new Intent(mContext, AlarmActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		getApplication().startActivity(intent);
+		stopSelf();
+	}
+
 	private class DummyThread extends Thread {
 
 		private final String TAG = DummyThread.class.getName();
 
 		private LinkedBlockingQueue<AccelDataPoint> output;
-		private Service service;
-		private long minTime;
-		private long maxTime;
 
-		public DummyThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue, Service service, long minTime, long maxTime) {
+		public DummyThread(LinkedBlockingQueue<AccelDataPoint> output) {
 			setDaemon(true);
-			this.output = sharedQueue;
-			this.service = service;
-			this.minTime = minTime;
-			this.maxTime = maxTime;
-			//[TODO] set alarm to go off at maxTime
+			this.output = output;
 		}
 
 		@Override
@@ -189,52 +192,9 @@ public class SensorService extends Service implements SensorEventListener {
 					break;
 				}
 				//[TODO] process the data here
-				data = null;
+				if (data != null) data = null;
 			}
 			//[TODO] cleanup here
-			Log.d(TAG, "thread finished");
-		}
-
-	}
-
-	private class StorageThread extends Thread {
-
-		private final String TAG = StorageThread.class.getName();
-
-		private LinkedBlockingQueue<AccelDataPoint> output;
-
-		public StorageThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue) {
-			setDaemon(true);
-			output = sharedQueue;
-		}
-
-		@Override
-		public void run() {
-			Log.d(TAG, "thread started");
-			GZIPOutputStream zos;
-			try {
-				zos = new GZIPOutputStream(new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/accel.bin.gz"));
-				while (true) {
-					// LinkedBlockingQueue.take() is a blocking operation
-					byte[] data;
-					try {
-						// LinkedBlockingQueue.take() is a blocking operation
-						data = output.take().serialize();
-					} catch (InterruptedException e) {
-						// thread is closing
-						break;
-					}
-					// process data here
-					zos.write(data, 0, data.length);
-				}
-				zos.flush();
-				zos.finish();
-				zos.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				zos = null;
-			}
 			Log.d(TAG, "thread finished");
 		}
 

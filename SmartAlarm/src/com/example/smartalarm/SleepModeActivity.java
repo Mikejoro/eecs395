@@ -70,6 +70,7 @@ public class SleepModeActivity extends Activity {
 		//daemon = new AccelThread(this,
 		//		.2, //this number is entirely arbitrary
 		//		startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis()); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis()
+		//daemon.start();
 		if (!SensorService.isRunning(this)) {
 			SensorService.start(this, startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis());
 		}
