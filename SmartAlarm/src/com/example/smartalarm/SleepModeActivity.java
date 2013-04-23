@@ -1,11 +1,8 @@
 package com.example.smartalarm;
 
-import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
@@ -13,21 +10,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.View;
-import android.widget.TextView;
 
 public class SleepModeActivity extends Activity {
 
 	private boolean awakened = false; //no longer really necessary
 	private MediaPlayer mp;
 	private Vibrator v;
-	AccelThread daemon;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +67,12 @@ public class SleepModeActivity extends Activity {
 		
 		hdlr = new AlarmHandler(this);
 		
-		daemon = new AccelThread(this,
-				.2, //this number is entirely arbitrary
-				startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis()); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis() 
-		daemon.start();
+		//daemon = new AccelThread(this,
+		//		.2, //this number is entirely arbitrary
+		//		startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis()); //the surrounding code needs to convert the wakeup times into long values as returned by System.currentTimeMillis()
+		if (!SensorService.isRunning(this)) {
+			SensorService.start(this, startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis());
+		}
 	}
 
 	

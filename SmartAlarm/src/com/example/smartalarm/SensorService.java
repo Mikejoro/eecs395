@@ -31,11 +31,17 @@ public class SensorService extends Service implements SensorEventListener {
 	private static final int SCREEN_OFF_RECEIVER_DELAY = 500;
 	private static final long WAIT_THREAD_CLOSE = 1000;
 
-	private static void start(Context context) {
-        context.startService(new Intent(context, SensorService.class));
+	private long minTime;
+	private long maxTime;
+
+	public static void start(Context context, long minTime, long maxTime) {
+		Intent intent = new Intent(context, SensorService.class);
+		intent.putExtra("minTime", minTime);
+		intent.putExtra("maxTime", maxTime);
+        context.startService(intent);
 	}
 
-	private static void stop(Context context) {
+	public static void stop(Context context) {
 		context.stopService(new Intent(context, SensorService.class));
 	}
 
@@ -104,13 +110,15 @@ public class SensorService extends Service implements SensorEventListener {
 		if (mPrefs.getBoolean("ck_accel", true)) {
 			mThread = new StorageThread(sharedQueue);
 		} else {
-			mThread = new DummyThread(sharedQueue);
+			mThread = new DummyThread(sharedQueue, this, minTime, maxTime);
 		}
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
+		minTime = intent.getLongExtra("minTime", 0);
+		maxTime = intent.getLongExtra("maxTime", 0);
 		startForeground(Process.myPid(), new Notification());
 		registerListener();
 		//mWakeLock.acquire();
@@ -155,10 +163,17 @@ public class SensorService extends Service implements SensorEventListener {
 		private final String TAG = DummyThread.class.getName();
 
 		private LinkedBlockingQueue<AccelDataPoint> output;
+		private Service service;
+		private long minTime;
+		private long maxTime;
 
-		public DummyThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue) {
+		public DummyThread(LinkedBlockingQueue<AccelDataPoint> sharedQueue, Service service, long minTime, long maxTime) {
 			setDaemon(true);
-			output = sharedQueue;
+			this.output = sharedQueue;
+			this.service = service;
+			this.minTime = minTime;
+			this.maxTime = maxTime;
+			//[TODO] set alarm to go off at maxTime
 		}
 
 		@Override
