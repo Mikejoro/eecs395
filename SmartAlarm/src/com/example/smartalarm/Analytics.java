@@ -38,22 +38,52 @@ public class Analytics {
 		return final_med;
 	}
 	
+	private static int clamp(int val, int low, int high)
+	{
+		return Math.max(Math.min(val, low), high);
+	}
+	
+	private static int fPos(int len, int sr, int f)
+	{
+		return clamp(len - sr/f, 0, len-1);
+	}
+	
+	private static int avg(float[] f, int a, int b)
+	{
+		int ret = 0;
+		for (int i = a; i < b; ++i)
+			ret += Math.abs(f[i]);
+		return ret / (b - a);
+	}
+	
+	/**
+	 * FFT with simplified outputs
+	 */
+	public static float[] spectrum(short[] data, int sample_rate) {
+		float[] fft = FFT(data);
+		int fourHz = fPos(fft.length, sample_rate, 4);
+		int fortyHz = fPos(fft.length, sample_rate, 40);
+		int fourHundHz = fPos(fft.length, sample_rate, 400);
+		int fourkHz = fPos(fft.length, sample_rate, 4000);
+		int fortykHz = fPos(fft.length, sample_rate, 40000);
+		
+		return new float[]{avg(fft, fourHz, fortyHz),
+				           avg(fft, fortyHz, fourHundHz),
+				           avg(fft, fourHundHz, fourkHz),
+				           avg(fft, fourkHz, fortykHz)};
+	}
+	
 	/**
 	 * Fast (n log(n) ish) Fourier Transform, in convenient types.
 	 * @param data Data array, may be of any length, but the more composite the faster.
 	 * @return Array of same length
 	 */
-	public static double[] FFT(short[] data) {
+	public static float[] FFT(short[] data) {
 		float[] nIn = new float[data.length];
 		for (int i=0; i<nIn.length; ++i)
 			nIn[i] = (float)data[i] / (float)Short.MAX_VALUE;
 
-		float[] nOut = FFT(nIn);
-
-		double[] out = new double[nOut.length];
-		for (int i=0; i<nOut.length; ++i)
-			out[i] = nOut[i];
-		return out;
+		return FFT(nIn);
 	}
 	
 	/**

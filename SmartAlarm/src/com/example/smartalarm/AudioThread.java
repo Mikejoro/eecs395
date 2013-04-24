@@ -53,7 +53,7 @@ public class AudioThread extends Thread {
 				samples += recorder.read(buffer, samples, min_buffer - samples);
 				if (samples == min_buffer) {
 					long ts = System.currentTimeMillis();
-					output.offer(new AudioDataPoint(ts, buffer));
+					output.offer(new AudioDataPoint(ts, Analytics.spectrum(buffer, sample_rate)));
 					samples = 0;
 					buffer = new short[min_buffer];
 				}
