@@ -24,16 +24,18 @@ import android.util.Log;
 public class SensorService extends Service implements SensorEventListener {
 
 	private static final String TAG = SensorService.class.getName();
+	private static final String MIN_TIME = "long minTime";
+	private static final String MAX_TIME = "long maxTime";
 	private static final int SCREEN_OFF_RECEIVER_DELAY = 500;
-	private static final long WAIT_THREAD_CLOSE = 1000;
+	private static final long WAIT_THREAD_CLOSE = 10;
 
 	private long minTime;
 	private long maxTime;
 
 	public static void start(Context context, long minTime, long maxTime) {
 		Intent intent = new Intent(context, SensorService.class);
-		intent.putExtra("minTime", minTime);
-		intent.putExtra("maxTime", maxTime);
+		intent.putExtra(MIN_TIME, minTime);
+		intent.putExtra(MAX_TIME, maxTime);
         context.startService(intent);
 	}
 
@@ -113,8 +115,8 @@ public class SensorService extends Service implements SensorEventListener {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
-		minTime = intent.getLongExtra("minTime", 0);
-		maxTime = intent.getLongExtra("maxTime", 0);
+		minTime = intent.getLongExtra(MIN_TIME, 0);
+		maxTime = intent.getLongExtra(MAX_TIME, 0);
 		startForeground(Process.myPid(), new Notification());
 		registerListener();
 		//mWakeLock.acquire();
@@ -122,9 +124,12 @@ public class SensorService extends Service implements SensorEventListener {
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				triggerAlarm();
+				if (isRunning(mContext)) {
+					triggerAlarm();
+				}
 			}
 		//[TODO] calculate delay necessary to trigger at maxTime
+		//System.currentTimeMillis() - maxTime
 		}, 10 * 1000);
 		return START_STICKY;
 	}

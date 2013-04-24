@@ -16,5 +16,6 @@
     <string name="title_activity_sleep_mode">SmartAlarm: Sleep Mode</string>
     <string name="confirm_failsafe_time">Confirm latest possible alarm time</string>
     <string name="title_activity_alarm">Alarm</string>
+    <string name="stop_service">Cancel Current Alarm</string>
 
 </resources>

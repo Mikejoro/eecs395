@@ -4,11 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import android.os.Bundle;
 import android.provider.Settings;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TimePicker;
@@ -60,12 +62,26 @@ public class ConfirmSleepAlarmActivity extends Activity {
 		TimePicker failsafePicker = (TimePicker) findViewById(R.id.alarmFailsafePicker);
 		int failsafeHours = failsafePicker.getCurrentHour();
 		int failsafeMinutes = failsafePicker.getCurrentMinute();
-		Intent intent = new Intent(this, SleepModeActivity.class);
+		/*Intent intent = new Intent(this, SleepModeActivity.class);
 		intent.putExtra(START_ALARM_HOURS, timeHours);
 		intent.putExtra(START_ALARM_MINUTES, timeMinutes);
 		intent.putExtra(FAILSAFE_ALARM_HOURS, failsafeHours);
 		intent.putExtra(FAILSAFE_ALARM_MINUTES, failsafeMinutes);
-		
+		startActivity(intent);*/
+
+		GregorianCalendar now = new GregorianCalendar();
+		GregorianCalendar startCalendar = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), timeHours, timeMinutes);
+		while (now.after(startCalendar)) {
+			startCalendar.add(Calendar.HOUR_OF_DAY, 12);
+		}
+		GregorianCalendar endCalendar = new GregorianCalendar(startCalendar.get(Calendar.YEAR), startCalendar.get(Calendar.MONTH), startCalendar.get(Calendar.DAY_OF_MONTH), failsafeHours, failsafeMinutes);
+		while (startCalendar.after(endCalendar)) {
+			endCalendar.add(Calendar.HOUR_OF_DAY, 12);
+		}
+		SensorService.start(this, startCalendar.getTimeInMillis(), endCalendar.getTimeInMillis());
+
+		Intent intent = new Intent(this, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 	}
 

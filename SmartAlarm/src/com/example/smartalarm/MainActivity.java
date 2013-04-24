@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -17,10 +18,27 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		Button btn = (Button) findViewById(R.id.button_Sleep);
+		if (SensorService.isRunning(this)) {
+			btn.setText(getString(R.string.stop_service));
+		} else {
+			btn.setText(getString(R.string.button_Sleep));
+		}
+	}
+
+	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.button_Sleep:
-				startActivity(new Intent(this, ConfirmSleepAlarmActivity.class));
+				Button btn = (Button) findViewById(R.id.button_Sleep);
+				if (SensorService.isRunning(this)) {
+					SensorService.stop(this);
+					btn.setText(getString(R.string.button_Sleep));
+				} else {
+					startActivity(new Intent(this, ConfirmSleepAlarmActivity.class));
+				}
 				break;
 			case R.id.button_ShowStats:
 				startActivity(new Intent(this, StatisticsActivity.class));
