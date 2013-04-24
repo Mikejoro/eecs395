@@ -32,6 +32,18 @@ public class AlarmActivity extends Activity {
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+		awakeButtonClicked(null);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		awakeButtonClicked(null);
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.sleep_mode, menu);
@@ -41,7 +53,6 @@ public class AlarmActivity extends Activity {
 	public void awakeButtonClicked(View view) {
 		if(mp != null)
 		{
-			
 			if(mp.isPlaying()){
 				try{
 					mp.stop();
@@ -50,11 +61,12 @@ public class AlarmActivity extends Activity {
 			try{
 				mp.release();
 			}catch(IllegalStateException e){}
-			
+			mp = null;
 		}
 		if(v != null)
 		{
 			v.cancel();
+			v = null;
 		}
 		//Intent intent = new Intent(this, MainActivity.class);
 		//startActivity(intent);
